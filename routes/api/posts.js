@@ -66,7 +66,7 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
     .then(profile => {
       Post.findById(req.params.id)
         .then(post => {
-          if(post.likes.filter(like => like.user.toString() === req.user.ide).length > 0) {
+          if(post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
             return res.status(400).json({ alreadyliked: 'User already liked this post' });
           }
 
@@ -164,18 +164,10 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
 // @desc Remove a comment from a Post
 // @access Private
 router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
-  const { errors, isValid } = validatePostInput(req.body);
-
-  // Check Validation
-  if (!isValid) {
-    // if errors, send error with 400
-    return res.status(400).json(errors);
-  }
-
   Post.findById(req.params.id)
     .then(post => {
       // Check if comment exists
-      if (post.comment.filter(comment => comment._id.toString() === req.params.comment_id).length === 0) {
+      if (post.comments.filter(comment => comment._id.toString() === req.params.comment_id).length === 0) {
         return res.status(404).json({ commentnotexist: 'Comment does not exist' });
       }
 
